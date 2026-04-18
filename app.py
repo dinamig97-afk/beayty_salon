@@ -414,4 +414,4 @@ def delete_item(item, item_id):
     return redirect("/dashboard")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
