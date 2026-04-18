@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель мастера</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-shell single">
+        <main class="dashboard-main wide">
+            <section class="admin-topbar">
+                <div>
+                    <span class="eyebrow">master panel</span>
+                    <h1>{{ master.name }}</h1>
+                    <p class="muted">{{ master.specialty }} · {{ master.experience }}</p>
+                </div>
+                <div class="top-actions">
+                    <a href="/" class="btn btn-outline">Сайт</a>
+                    <a href="/logout" class="btn">Выйти</a>
+                </div>
+            </section>
+
+            <section class="stats-grid admin-stats">
+                <div class="stat-card"><strong>{{ bookings|length }}</strong><span>моих записей</span></div>
+                <div class="stat-card"><strong>{{ bookings|selectattr('status', 'equalto', 'new')|list|length }}</strong><span>новых</span></div>
+                <div class="stat-card"><strong>{{ bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</strong><span>confirmed</span></div>
+                <div class="stat-card"><strong>{{ bookings|selectattr('status', 'equalto', 'done')|list|length }}</strong><span>done</span></div>
+            </section>
+
+            <section class="dashboard-card">
+                <div class="section-head left"><h2>Мои клиенты</h2></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Клиент</th>
+                                <th>Телефон</th>
+                                <th>Услуга</th>
+                                <th>Дата</th>
+                                <th>Комментарий</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.client_name }}</td>
+                                <td>{{ booking.phone }}</td>
+                                <td>{{ booking.service_name }}<br><small>{{ booking.price }}</small></td>
+                                <td>{{ booking.date }} {{ booking.time }}</td>
+                                <td>{{ booking.comment or '—' }}</td>
+                                <td>
+                                    <form action="/booking/{{ booking.id }}/status" method="POST">
+                                        <select name="status" onchange="this.form.submit()">
+                                            <option value="new" {% if booking.status == 'new' %}selected{% endif %}>new</option>
+                                            <option value="confirmed" {% if booking.status == 'confirmed' %}selected{% endif %}>confirmed</option>
+                                            <option value="done" {% if booking.status == 'done' %}selected{% endif %}>done</option>
+                                            <option value="cancelled" {% if booking.status == 'cancelled' %}selected{% endif %}>cancelled</option>
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6">Клиентов пока нет.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Aura Beauty Studio</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script defer src="/static/script.js"></script>
+</head>
+<body>
+    <header class="hero">
+        <nav class="nav container">
+            <div class="logo">Velvet Aura</div>
+            <div class="nav-links">
+                <a href="#services">Услуги</a>
+                <a href="#masters">Мастера</a>
+                <a href="#portfolio">Портфолио</a>
+                <a href="/login" class="btn btn-outline small">Вход</a>
+            </div>
+        </nav>
+
+        <div class="container hero-grid">
+            <div class="hero-text">
+                <span class="badge">premium beauty space</span>
+                <h1>Салон, в который хочется записаться с первого взгляда</h1>
+                <p>Маникюр, брови, ресницы, макияж и сервис уровня boutique studio. Красивый сайт, красивые мастера, красивая запись.</p>
+                <div class="hero-actions">
+                    <a href="#booking" class="btn">Записаться</a>
+                    <a href="#portfolio" class="btn btn-secondary">Смотреть работы</a>
+                </div>
+                {% if request.args.get('booked') == 'success' %}
+                    <div class="notice success">Запись успешно создана 💖</div>
+                {% elif request.args.get('booked') == 'busy' %}
+                    <div class="notice error">Это время уже занято. Выбери другой слот.</div>
+                {% endif %}
+            </div>
+            <div class="hero-card">
+                <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1200&q=80" alt="beauty studio">
+            </div>
+        </div>
+    </header>
+
+    <section class="section container">
+        <div class="stats-grid">
+            <div class="stat-card"><strong>Premium</strong><span>дизайн и атмосфера</span></div>
+            <div class="stat-card"><strong>{{ masters|length }}</strong><span>мастера</span></div>
+            <div class="stat-card"><strong>{{ services|length }}</strong><span>услуг</span></div>
+            <div class="stat-card"><strong>9</strong><span>слотов в день</span></div>
+        </div>
+    </section>
+
+    <section class="section container" id="services">
+        <div class="section-head">
+            <span class="eyebrow">services</span>
+            <h2>Услуги и цены</h2>
+        </div>
+        <div class="cards-grid three">
+            {% for service in services %}
+            <article class="glass-card">
+                <h3>{{ service.name }}</h3>
+                <div class="price-row">
+                    <span>{{ service.price }}</span>
+                    <span>{{ service.duration }}</span>
+                </div>
+                <p>{{ service.description }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section section-soft" id="masters">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">team</span>
+                <h2>Наши мастера</h2>
+            </div>
+            <div class="cards-grid three">
+                {% for master in masters %}
+                <article class="master-card">
+                    <img src="{{ master.photo_url }}" alt="{{ master.name }}">
+                    <div class="master-body">
+                        <span class="mini-badge">{{ master.experience }}</span>
+                        <h3>{{ master.name }}</h3>
+                        <p class="master-role">{{ master.specialty }}</p>
+                        <p>{{ master.bio }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section container" id="portfolio">
+        <div class="section-head">
+            <span class="eyebrow">portfolio</span>
+            <h2>Работы, которые продают запись</h2>
+        </div>
+        <div class="portfolio-grid">
+            {% for item in portfolio %}
+            <article class="portfolio-card">
+                <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                <div class="overlay">
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.master_name }}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="center mt-24">
+            <a href="/masters" class="btn btn-secondary">Смотреть всех мастеров и портфолио</a>
+        </div>
+    </section>
+
+    <section class="section section-soft" id="booking">
+        <div class="container booking-layout">
+            <div>
+                <span class="eyebrow">booking</span>
+                <h2>Онлайн-запись</h2>
+                <p class="muted">Клиент выбирает мастера, дату, время и сразу оставляет контакты. В панели мастера и админа запись появится автоматически.</p>
+                <ul class="benefits">
+                    <li>Свободные слоты подгружаются по выбранному мастеру</li>
+                    <li>Админ видит все записи</li>
+                    <li>Мастер видит только своих клиентов</li>
+                </ul>
+            </div>
+
+            <form class="booking-card" action="/book" method="POST">
+                <input name="client_name" placeholder="Ваше имя" required>
+                <input name="phone" placeholder="Телефон" required>
+
+                <select name="service_id" required>
+                    <option value="">Выберите услугу</option>
+                    {% for service in services %}
+                    <option value="{{ service.id }}">{{ service.name }} — {{ service.price }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="master_id" id="master_id" required>
+                    <option value="">Выберите мастера</option>
+                    {% for master in masters %}
+                    <option value="{{ master.id }}">{{ master.name }} — {{ master.specialty }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="date" name="date" id="date" required>
+                <select name="time" id="time" required>
+                    <option value="">Сначала выберите мастера и дату</option>
+                </select>
+
+                <textarea name="comment" rows="4" placeholder="Комментарий к записи"></textarea>
+                <button class="btn full">Подтвердить запись</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="section container">
+        <div class="section-head">
+            <span class="eyebrow">reviews</span>
+            <h2>Почему клиенты возвращаются</h2>
+        </div>
+        <div class="cards-grid three">
+            <article class="glass-card review-card">
+                <p>“Очень дорогая по ощущению атмосфера, и сайт сразу вызывает доверие.”</p>
+                <strong>Alina</strong>
+            </article>
+            <article class="glass-card review-card">
+                <p>“Записалась онлайн за минуту, мастер уже ждал меня в панели.”</p>
+                <strong>Eva</strong>
+            </article>
+            <article class="glass-card review-card">
+                <p>“Идеальный вариант для студии, которая хочет выглядеть премиально.”</p>
+                <strong>Nika</strong>
+            </article>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container footer-row">
+            <div>
+                <div class="logo dark">Velvet Aura</div>
+                <p>Beauty studio with premium feeling.</p>
+            </div>
+            <div class="footer-links">
+                <a href="/">Главная</a>
+                <a href="/masters">Мастера</a>
+                <a href="/login">Вход</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

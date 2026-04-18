@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth-body">
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <a href="/" class="logo dark center-logo">Velvet Aura</a>
+            <h1>Вход для сотрудников</h1>
+            <p class="muted">Админ управляет салоном, мастер видит только свои записи.</p>
+
+            {% if error %}
+            <div class="notice error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="auth-form">
+                <input name="username" placeholder="Логин" required>
+                <input name="password" type="password" placeholder="Пароль" required>
+                <button class="btn full">Войти</button>
+            </form>
+
+            <div class="demo-logins">
+                <strong>Демо вход:</strong>
+                <p>admin / 1234</p>
+                <p>sofia / 1234</p>
+                <p>emma / 1234</p>
+                <p>mia / 1234</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

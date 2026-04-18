@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div>
+                <div class="logo">Velvet Aura</div>
+                <p class="sidebar-subtitle">admin panel</p>
+            </div>
+            <div class="sidebar-links">
+                <a href="#stats">Обзор</a>
+                <a href="#bookings">Записи</a>
+                <a href="#masters">Мастера</a>
+                <a href="#services">Услуги</a>
+                <a href="#portfolio">Портфолио</a>
+                <a href="#users">Сотрудники</a>
+            </div>
+            <div class="sidebar-actions">
+                <a href="/" class="btn btn-outline full">Сайт</a>
+                <a href="/logout" class="btn full">Выйти</a>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <section id="stats" class="admin-topbar">
+                <div>
+                    <span class="eyebrow">dashboard</span>
+                    <h1>Панель администратора</h1>
+                </div>
+            </section>
+
+            <section class="stats-grid admin-stats">
+                <div class="stat-card"><strong>{{ stats.bookings }}</strong><span>всего записей</span></div>
+                <div class="stat-card"><strong>{{ stats.new_bookings }}</strong><span>новых</span></div>
+                <div class="stat-card"><strong>{{ stats.masters }}</strong><span>мастеров</span></div>
+                <div class="stat-card"><strong>{{ stats.services }}</strong><span>услуг</span></div>
+            </section>
+
+            <section id="bookings" class="dashboard-card">
+                <div class="section-head left">
+                    <h2>Все записи</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Клиент</th>
+                                <th>Телефон</th>
+                                <th>Услуга</th>
+                                <th>Мастер</th>
+                                <th>Дата</th>
+                                <th>Статус</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.client_name }}</td>
+                                <td>{{ booking.phone }}</td>
+                                <td>{{ booking.service_name }}<br><small>{{ booking.price }}</small></td>
+                                <td>{{ booking.master_name }}</td>
+                                <td>{{ booking.date }} {{ booking.time }}</td>
+                                <td>
+                                    <form action="/booking/{{ booking.id }}/status" method="POST">
+                                        <select name="status" onchange="this.form.submit()">
+                                            <option value="new" {% if booking.status == 'new' %}selected{% endif %}>new</option>
+                                            <option value="confirmed" {% if booking.status == 'confirmed' %}selected{% endif %}>confirmed</option>
+                                            <option value="done" {% if booking.status == 'done' %}selected{% endif %}>done</option>
+                                            <option value="cancelled" {% if booking.status == 'cancelled' %}selected{% endif %}>cancelled</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td><a class="delete-link" href="/delete/booking/{{ booking.id }}">Удалить</a></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="7">Записей пока нет.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="masters" class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Добавить мастера</h2></div>
+                    <form action="/admin/add-master" method="POST" class="admin-form">
+                        <input name="name" placeholder="Имя мастера" required>
+                        <input name="specialty" placeholder="Специализация" required>
+                        <input name="experience" placeholder="Опыт, например 5 лет">
+                        <input name="photo_url" placeholder="Ссылка на фото">
+                        <input name="sort_order" type="number" placeholder="Порядок вывода">
+                        <textarea name="bio" placeholder="Короткое описание"></textarea>
+                        <button class="btn full">Добавить мастера</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Список мастеров</h2></div>
+                    <div class="simple-list">
+                        {% for master in masters %}
+                        <div class="list-row">
+                            <div>
+                                <strong>{{ master.name }}</strong>
+                                <p>{{ master.specialty }} · {{ master.experience }}</p>
+                            </div>
+                            <a class="delete-link" href="/delete/master/{{ master.id }}">Удалить</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section id="services" class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Добавить услугу</h2></div>
+                    <form action="/admin/add-service" method="POST" class="admin-form">
+                        <input name="name" placeholder="Название услуги" required>
+                        <input name="price" placeholder="Цена, например 1000 Kč" required>
+                        <input name="duration" placeholder="Длительность, например 60 мин" required>
+                        <textarea name="description" placeholder="Описание"></textarea>
+                        <button class="btn full">Добавить услугу</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Все услуги</h2></div>
+                    <div class="simple-list">
+                        {% for service in services %}
+                        <div class="list-row">
+                            <div>
+                                <strong>{{ service.name }}</strong>
+                                <p>{{ service.price }} · {{ service.duration }}</p>
+                            </div>
+                            <a class="delete-link" href="/delete/service/{{ service.id }}">Удалить</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section id="portfolio" class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Добавить работу в портфолио</h2></div>
+                    <form action="/admin/add-portfolio" method="POST" class="admin-form">
+                        <select name="master_id" required>
+                            <option value="">Выбери мастера</option>
+                            {% for master in masters %}
+                            <option value="{{ master.id }}">{{ master.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input name="title" placeholder="Название работы" required>
+                        <input name="image_url" placeholder="Ссылка на фото" required>
+                        <textarea name="description" placeholder="Описание"></textarea>
+                        <button class="btn full">Добавить работу</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Работы</h2></div>
+                    <div class="simple-list">
+                        {% for item in portfolio %}
+                        <div class="list-row">
+                            <div>
+                                <strong>{{ item.title }}</strong>
+                                <p>{{ item.master_name }}</p>
+                            </div>
+                            <a class="delete-link" href="/delete/portfolio/{{ item.id }}">Удалить</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section id="users" class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Добавить сотрудника</h2></div>
+                    <form action="/admin/add-user" method="POST" class="admin-form">
+                        <input name="username" placeholder="Логин" required>
+                        <input name="password" placeholder="Пароль" required>
+                        <select name="role" id="role_select" onchange="toggleMasterSelect()">
+                            <option value="admin">admin</option>
+                            <option value="master">master</option>
+                        </select>
+                        <select name="master_id" id="master_select">
+                            <option value="">Привязать мастера</option>
+                            {% for master in masters %}
+                            <option value="{{ master.id }}">{{ master.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn full">Добавить сотрудника</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="section-head left"><h2>Сотрудники</h2></div>
+                    <div class="simple-list">
+                        {% for user in users %}
+                        <div class="list-row">
+                            <div>
+                                <strong>{{ user.username }}</strong>
+                                <p>{{ user.role }}{% if user.master_name %} · {{ user.master_name }}{% endif %}</p>
+                            </div>
+                            {% if user.username != 'admin' %}
+                            <a class="delete-link" href="/delete/user/{{ user.id }}">Удалить</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        function toggleMasterSelect() {
+            const role = document.getElementById('role_select').value;
+            const masterSelect = document.getElementById('master_select');
+            masterSelect.style.display = role === 'master' ? 'block' : 'none';
+        }
+        toggleMasterSelect();
+    </script>
+</body>
+</html>

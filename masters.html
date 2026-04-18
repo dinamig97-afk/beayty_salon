@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мастера и портфолио</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <section class="page-top">
+        <div class="container nav-simple">
+            <a href="/" class="logo dark">Velvet Aura</a>
+            <a href="/" class="btn btn-outline small">На главную</a>
+        </div>
+    </section>
+
+    <section class="section container">
+        <div class="section-head">
+            <span class="eyebrow">team</span>
+            <h1>Наши мастера</h1>
+        </div>
+        <div class="cards-grid three">
+            {% for master in masters %}
+            <article class="master-card">
+                <img src="{{ master.photo_url }}" alt="{{ master.name }}">
+                <div class="master-body">
+                    <span class="mini-badge">{{ master.experience }}</span>
+                    <h3>{{ master.name }}</h3>
+                    <p class="master-role">{{ master.specialty }}</p>
+                    <p>{{ master.bio }}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section section-soft">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">works</span>
+                <h2>Портфолио</h2>
+            </div>
+            <div class="portfolio-grid">
+                {% for item in portfolio %}
+                <article class="portfolio-card">
+                    <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                    <div class="overlay">
+                        <h3>{{ item.title }}</h3>
+                        <p>{{ item.master_name }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</body>
+</html>
