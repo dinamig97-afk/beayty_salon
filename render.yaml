@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: beauty-salon-premium
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
